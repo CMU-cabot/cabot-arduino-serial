@@ -26,6 +26,9 @@
 #include <Wire.h>
 #include <std_msgs/UInt8.h>
 #include "SensorReader.h"
+#ifdef ESP32
+#include <analogWrite.h>
+#endif
 
 class VibratorController: public SensorReader {
   int vib1_pin_;

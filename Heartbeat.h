@@ -24,6 +24,9 @@
 #define ARDUINO_NODE_HEARTBEAT_H
 
 #include <Arduino.h>
+#ifdef ESP32
+#include <analogWrite.h>
+#endif
 
 class Heartbeat {
   int led_pin_;

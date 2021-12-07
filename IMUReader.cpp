@@ -26,23 +26,40 @@
 
 IMUReader::IMUReader(ros::NodeHandle &nh):
   SensorReader(nh),
-  imu_pub_("imu_raw", &imu_msg_)
+  imu_pub_("imu_raw", &imu_msg_),
+  calibration_pub_("calibration", &calibration_msg_)
 {
   nh_.advertise(imu_pub_);
+  nh_.advertise(calibration_pub_);
+}
+
+void IMUReader::calibration() {
+  in_calibration_ = true;
+  init();
 }
 
 void IMUReader::init() {
+  init(NULL);
+}
+
+void IMUReader::init(uint8_t *offsets) {
   if(!imu_.begin())
   {
     nh_.loginfo("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
     return;
   }
   initialized_ = true;
+  if (offsets != NULL) {
+    imu_.setSensorOffsets(offsets);
+  }
   imu_.setExtCrystalUse(true);
 
   // time 2 + orientation 4 + angular_velocy 3 + linear_acceleration 3
   imu_msg_.data = (float*)malloc(sizeof(float)*12);
   imu_msg_.data_length = 12;
+
+  calibration_msg_.data = (uint8_t*)malloc(sizeof(uint8_t)*26);
+  calibration_msg_.data_length = 26;
 }
 
 void IMUReader::update() {
@@ -75,4 +92,14 @@ void IMUReader::update() {
 
   // publish
   imu_pub_.publish( &imu_msg_ );
+
+  if (in_calibration_ == false) {
+    return;
+  }
+
+  uint8_t *offsets = calibration_msg_.data;
+  imu_.getSensorOffsets(offsets);
+  imu_.getCalibration(offsets+22, offsets+23, offsets+24, offsets+25);
+
+  calibration_pub_.publish( &calibration_msg_);
 }

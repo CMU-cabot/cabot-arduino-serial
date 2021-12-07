@@ -4,6 +4,24 @@
 
 This repository contains an Arduino project for CaBot, managaing sensors and the handle.
 
+# Usage
+
+```
+$ rosrun rosserial_python serial_node.py <parameters>
+```
+
+## parameters
+
+- **calibration_params** : `int[22]`
+  - BNO055 calibration parameter. Follow instruction when you not specify this parameter.
+- **touch_params** : [`touch_base (int)`, `touch_threshold (int)`, `release_threshold (int)`]
+  - Touch threshold parameters
+  - `touch_base` - base value when you don't touch the touch sensor
+  - `touch_threshold` - if the value is below `touch_base - touch_threshold` then changes to touch state
+  - `release_threshold` - After transitioning to touch state, the value bigger than `touch_base - release_threshold` then changes to release state
+- ~**touch_threshold**~ deprecated (int) - touch threshold
+- ~**release_threshold**~ deprecated - release threshold
+
 ## Pre-requisites
 
 ### Hardware
@@ -11,7 +29,7 @@ This repository contains an Arduino project for CaBot, managaing sensors and the
 One example of hardware components
 
 - [3D print parts](https://github.com/CMU-cabot/cabot_design/tree/master/cabot2_e2/handle)
-- [Arduino Mega 2560](https://store.arduino.cc/usa/mega-2560-r3)
+- [Arduino Mega 2560](https://store.arduino.cc/usa/mega-2560-r3) or ESP32 (beta)
 - [MPR121](https://www.adafruit.com/product/1982) capacitive touch sensor
 - [BNG055](https://www.adafruit.com/product/2472) 9-axis IMU
 - [BMP280](https://www.adafruit.com/product/2651) Barometric Pressure & Altitude Sensor
@@ -42,6 +60,11 @@ git clone https://github.com/frankjoshua/rosserial_arduino_lib.git
 rosrun rosserial_arduino make_libraries.py ~/Arduino
 ```
 
+#### tips
+
+- rosserial 0.7.9 works with Arduino Mega 2560
+- rosserial 0.9.1 works with EPS32
+
 ## Assembly instructions
 
 The following figure explains the manner in which the touch sensor, push buttons and vibrators are supposed to be connected with Arduino Mega 2560.
@@ -57,4 +80,3 @@ The following figure explains the manner in which the touch sensor, push buttons
 - The three vibrators are useful for giving alerts to the user in response to obstacles encountered in the front and on the sides of the robot while it is moving. They also provide alerts/ warnings to the user about upcoming left turns and right turns.
 - The four push butons are useful for giving manual input signals to the robot, to command it to move in preferred directions (forward, backward, left turn, and right turn).
 - The touch sensor is usually connected to a conductive material like copper film, or copper plate.
-
