@@ -52,6 +52,7 @@ Timer timer;
 #define BTN2_PIN (14) // down
 #define BTN3_PIN (15) // left
 #define BTN4_PIN (16) // right
+#define BTN5_PIN (12) // decision
 
 #define VIB1_PIN (19)  //front
 #define VIB2_PIN (20)   //back //not using
@@ -62,6 +63,7 @@ Timer timer;
 #define BTN2_PIN (3) // down
 #define BTN3_PIN (4) // left
 #define BTN4_PIN (5) // right
+#define BTN5_PIN (7) // decision
 
 #define VIB1_PIN (11)  //front
 #define VIB2_PIN (6)   //back //not using
@@ -77,7 +79,7 @@ Timer timer;
 
 // sensors
 BarometerReader bmpReader(nh);
-ButtonsReader buttonsReader(nh, BTN1_PIN, BTN2_PIN, BTN3_PIN, BTN4_PIN);
+ButtonsReader buttonsReader(nh, BTN1_PIN, BTN2_PIN, BTN3_PIN, BTN4_PIN, BTN5_PIN);
 IMUReader imuReader(nh);
 TouchReader touchReader(nh);
 
@@ -116,6 +118,7 @@ void setup()
   for(int i = 0; i < 22; i++) {
     offsets[i] = calibration_params[i] & 0xFF;
   }
+  //nh.loginfo("loglogloglog!!!!!!!!!!!");
 
 
   int touch_params[3];
