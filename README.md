@@ -40,7 +40,19 @@ One example of hardware components
 - Conductive Material (ex. [Copper foil tape](https://www.adafruit.com/product/3483))
 - Wires and headers
 
-### Software
+### Software (docker, arduino-ide)
+
+```
+  host $ docker-compose build
+  host $ docker-compose run arduino
+docker $ arduino-cli compile -b arduino:avr:mega:cpu=atmega2560 cabot-arduino/
+docker $ arduino-cli upload -b arduino:avr:mega:cpu=atmega2560 -p /dev/ttyARDUINO_MEGA cabot-arduino/
+```
+- change `-b <board type> -p <port>` for your environment
+- linux is required to upload built sketch (Windows/Mac docker container does not support)
+
+
+### Software (Arduino IDE)
 
 In order to run ROS on Arduino Mega 2560, you will need both the Arduino IDE as well as ROS Serial Arduino Library. Please follow the instructions on the following page for installing these requirements:
 [Installation instructions](http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup)

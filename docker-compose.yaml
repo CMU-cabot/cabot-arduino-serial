@@ -1,0 +1,20 @@
+version: "2.3"
+
+
+services:
+  arduino:
+    build: .
+    volumes:
+      - ./:/mnt/cabot-arduino
+      - /dev:/dev
+      - /sys/devices:/sys/devices
+# required for display or device
+    privileged: true
+# device, bluetooth
+    devices:
+      - /dev/dri
+# device, bluetooth
+    network_mode: host
+    working_dir: /mnt
+    command:
+      - "bash"
