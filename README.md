@@ -55,7 +55,7 @@ git clone https://github.com/adafruit/Adafruit_Sensor.git
 git clone https://github.com/adafruit/Adafruit_ADXL343.git
 git clone https://github.com/adafruit/Adafruit_MPR121.git
 git clone https://github.com/adafruit/Adafruit_BMP280.git
-git clone https://github.com/JChristensen/Timer.git
+git clone https://github.com/contrem/arduino-timer
 git clone https://github.com/frankjoshua/rosserial_arduino_lib.git
 rosrun rosserial_arduino make_libraries.py ~/Arduino
 ```

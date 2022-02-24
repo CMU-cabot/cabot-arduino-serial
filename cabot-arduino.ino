@@ -29,7 +29,7 @@
 #endif
 
 #include "Arduino.h"
-#include <Timer.h>
+#include <arduino-timer.h>
 
 #include "BarometerReader.h"
 #include "ButtonsReader.h"
@@ -39,7 +39,7 @@
 #include "VibratorController.h"
 
 ros::NodeHandle nh;
-Timer timer;
+Timer<10> timer;
 
 // configurations
 #define BAUDRATE (115200)
@@ -185,6 +185,6 @@ void setup()
 
 void loop()
 {
-  timer.update();
+  timer.tick<void>();
   nh.spinOnce();
 }
