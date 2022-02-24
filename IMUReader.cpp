@@ -92,8 +92,10 @@ void IMUReader::update() {
 
   // publish
   imu_pub_.publish( &imu_msg_ );
+}
 
-  if (in_calibration_ == false) {
+void IMUReader::update_calibration() {
+  if (!initialized_) {
     return;
   }
 

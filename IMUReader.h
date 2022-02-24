@@ -43,6 +43,7 @@ public:
   void init();
   void init(uint8_t *offsets);
   void update();
+  void update_calibration();
 };
 
 

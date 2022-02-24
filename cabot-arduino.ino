@@ -108,6 +108,7 @@ void setup()
     imuReader.calibration();
     timer.every(100, [](){
       imuReader.update();
+      imuReader.update_calibration();
     });
     nh.loginfo("Calibration Mode started");
     return;
