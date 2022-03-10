@@ -45,8 +45,12 @@ One example of hardware components
 ```
   host $ docker-compose build
   host $ docker-compose run arduino
-docker $ arduino-cli compile -b arduino:avr:mega:cpu=atmega2560 cabot-arduino/
-docker $ arduino-cli upload -b arduino:avr:mega:cpu=atmega2560 -p /dev/ttyARDUINO_MEGA cabot-arduino/
+docker $ ./build.sh all                # build and upload (with -b arduino:avr:mega:cpu=atmega2560 -p /dev/ttyARDUINO_MEGA)
+                                       # you can set board by ARDUINO_BOARD, and port by ARDUINO_PORT environment variables
+
+or use arduino-cli
+docker $ arduino-cli compile -b arduino:avr:mega:cpu=atmega2560 .
+docker $ arduino-cli upload -b arduino:avr:mega:cpu=atmega2560 -p /dev/ttyARDUINO_MEGA .
 ```
 - change `-b <board type> -p <port>` for your environment
 - linux is required to upload built sketch (Windows/Mac docker container does not support)

@@ -4,6 +4,9 @@ version: "2.3"
 services:
   arduino:
     build: .
+    environment:
+      - ARDUINO_BOARD
+      - ARDUINO_PORT
     volumes:
       - ./:/mnt/cabot-arduino
       - /dev:/dev
@@ -15,6 +18,6 @@ services:
       - /dev/dri
 # device, bluetooth
     network_mode: host
-    working_dir: /mnt
+    working_dir: /mnt/cabot-arduino
     command:
       - "bash"
