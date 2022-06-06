@@ -52,6 +52,7 @@ Timer<10> timer;
 #define BTN2_PIN (14) // down
 #define BTN3_PIN (15) // left
 #define BTN4_PIN (16) // right
+#define BTN5_PIN (12) // decision
 
 #define VIB1_PIN (19)  //front
 #define VIB2_PIN (20)   //back //not using
@@ -59,14 +60,15 @@ Timer<10> timer;
 #define VIB4_PIN (17)   //right
 #else
 #define BTN1_PIN (2) // up
-#define BTN2_PIN (3) // down
-#define BTN3_PIN (4) // left
+#define BTN2_PIN (4) // down
+#define BTN3_PIN (3) // left
 #define BTN4_PIN (5) // right
+#define BTN5_PIN (6) // decision
 
-#define VIB1_PIN (11)  //front
-#define VIB2_PIN (6)   //back //not using
-#define VIB3_PIN (10)  //left
-#define VIB4_PIN (9)   //right
+#define VIB1_PIN (10)  //front
+#define VIB2_PIN (12)   //back //not using
+#define VIB3_PIN (9)  //left
+#define VIB4_PIN (11)   //right
 #endif
 
 
@@ -77,7 +79,7 @@ Timer<10> timer;
 
 // sensors
 BarometerReader bmpReader(nh);
-ButtonsReader buttonsReader(nh, BTN1_PIN, BTN2_PIN, BTN3_PIN, BTN4_PIN);
+ButtonsReader buttonsReader(nh, BTN1_PIN, BTN2_PIN, BTN3_PIN, BTN4_PIN, BTN5_PIN);
 IMUReader imuReader(nh);
 TouchReader touchReader(nh);
 
