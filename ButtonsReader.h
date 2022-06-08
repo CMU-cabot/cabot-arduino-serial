@@ -25,6 +25,7 @@
 
 #include <Wire.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Int8.h>
 #include "SensorReader.h"
 
 class ButtonsReader: public SensorReader {
@@ -33,16 +34,18 @@ class ButtonsReader: public SensorReader {
   int b3_pin_;
   int b4_pin_;
   int b5_pin_;
-  ros::Publisher b1_pub_;
-  ros::Publisher b2_pub_;
-  ros::Publisher b3_pub_;
-  ros::Publisher b4_pub_;
-  ros::Publisher b5_pub_;
-  std_msgs::Bool b1_msg_;
-  std_msgs::Bool b2_msg_;
-  std_msgs::Bool b3_msg_;
-  std_msgs::Bool b4_msg_;
-  std_msgs::Bool b5_msg_;
+//  ros::Publisher b1_pub_;
+//  ros::Publisher b2_pub_;
+//  ros::Publisher b3_pub_;
+//  ros::Publisher b4_pub_;
+//  ros::Publisher b5_pub_;
+  ros::Publisher b_pub_;
+//  std_msgs::Bool b1_msg_;
+//  std_msgs::Bool b2_msg_;
+//  std_msgs::Bool b3_msg_;
+//  std_msgs::Bool b4_msg_;
+//  std_msgs::Bool b5_msg_;
+  std_msgs::Int8 b_msg_;
 public:
   ButtonsReader(ros::NodeHandle &nh, int b1_pin, int b2_pin, int b3_pin, int b4_pin, int b5_pin);
   void init();
