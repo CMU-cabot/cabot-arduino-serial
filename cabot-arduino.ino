@@ -112,7 +112,7 @@ void setup()
 
   int calibration_params[22];
   uint8_t *offsets = NULL;
-  if (nh.getParam("~calibration_params", calibration_params, 22, 500)) {
+  if (nh.getParam("~calibration_params", calibration_params, 22, 1000)) {
     offsets = malloc(sizeof(uint8_t) * 22);
     for(int i = 0; i < 22; i++) {
       offsets[i] = calibration_params[i] & 0xFF;
