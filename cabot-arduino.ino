@@ -45,7 +45,7 @@ Timer<10> timer;
 #define BTN2_PIN (3) // down
 #define BTN3_PIN (4) // left
 #define BTN4_PIN (5) // right
-#define BTN5_PIN (6) // decision //not using
+#define BTN5_PIN (0) // decision //not using
 
 #define VIB1_PIN (11)  //front
 #define VIB2_PIN (6)   //back //not using

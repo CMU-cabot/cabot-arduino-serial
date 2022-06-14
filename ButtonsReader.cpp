@@ -47,7 +47,10 @@ void ButtonsReader::update() {
   int reading_2 = !digitalRead(b2_pin_);
   int reading_3 = !digitalRead(b3_pin_);
   int reading_4 = !digitalRead(b4_pin_);
-  int reading_5 = !digitalRead(b5_pin_);
+  int reading_5 = 0;
+  if (b5_pin_ > 0) {
+    reading_5 = !digitalRead(b5_pin_);
+  }
 
   for(int i = 0; i < 10; i++) {
     delayMicroseconds(10);
@@ -55,7 +58,9 @@ void ButtonsReader::update() {
     reading_2 = reading_2 && !digitalRead(b2_pin_);
     reading_3 = reading_3 && !digitalRead(b3_pin_);  
     reading_4 = reading_4 && !digitalRead(b4_pin_); 
-    reading_5 = reading_5 && !digitalRead(b5_pin_);   
+    if (b5_pin_ > 0) {
+      reading_5 = reading_5 && !digitalRead(b5_pin_);
+    }
   }
   
   b_msg_.data = reading_1 | reading_2<<1 | reading_3<<2 | reading_4<<3 | reading_5<<4;
