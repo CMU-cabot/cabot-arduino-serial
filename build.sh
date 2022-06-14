@@ -18,7 +18,7 @@ function help() {
     echo "-h         show this help"
     echo "-b <board> set board (default=arduino:avr:mega:cpu=atmega2560)"
     echo "-p <port>  set port (default=/dev/ttyARDUINO_MEGA)"
-    echo "-m <mode>  set mode (ESPT32/GT/GTM) **REQUIRED** to set"
+    echo "-m <mode>  set mode (GT/GTM) **REQUIRED** to set"
 }
 
 : ${ARDUINO_BOARD:="arduino:avr:mega:cpu=atmega2560"}

@@ -20,13 +20,7 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-#ifdef ESP32
-#undef ESP32
 #include <ros.h>
-#define ESP32
-#else
-#include <ros.h>
-#endif
 
 #include "Arduino.h"
 #include <arduino-timer.h>
@@ -45,20 +39,6 @@ Timer<10> timer;
 #define BAUDRATE (115200)
 
 #define HEARTBEAT_DELAY (20)
-
-#ifdef ESP32
-// TODO: need to reconfigure
-#define BTN1_PIN (13) // up
-#define BTN2_PIN (14) // down
-#define BTN3_PIN (15) // left
-#define BTN4_PIN (16) // right
-#define BTN5_PIN (12) // decision
-
-#define VIB1_PIN (19)  //front
-#define VIB2_PIN (20)   //back //not using
-#define VIB3_PIN (18)  //left
-#define VIB4_PIN (17)   //right
-#endif
 
 #ifdef GT
 #define BTN1_PIN (2) // up
