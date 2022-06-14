@@ -14,11 +14,13 @@ function help() {
 
 : ${ARDUINO_BOARD:="arduino:avr:mega:cpu=atmega2560"}
 : ${ARDUINO_PORT:="/dev/ttyARDUINO_MEGA"}
+: ${ARDUINO_MODE:="GT"}
 
 board=$ARDUINO_BOARD
 port=$ARDUINO_PORT
+mode=$ARUDINO_MODE
 
-while getopts "hb:p:" arg; do
+while getopts "hb:p:m:" arg; do
     case $arg in
 	h)
 	    help
@@ -30,6 +32,9 @@ while getopts "hb:p:" arg; do
 	p)
 	    port=$OPTARG
 	    ;;
+	m)
+	    mode=$OPTARG
+	    ;;
     esac
 done
 
@@ -40,12 +45,12 @@ fi
 
 function build() {
     echo "building..."
-    arduino-cli compile -b $board .
+    arduino-cli compile -b $board . --build-properties compiler.cpp.extra_flag=-D$mode
 }
 
 function upload() {
     echo "uploading..."
-    arduino-cli upload -b $board -p $port .
+    arduino-cli upload -b $board -p $port . --build-properties compiler.cpp.extra_flag=-D$mode
 }    
 
 if [ $target == "build" ]; then
