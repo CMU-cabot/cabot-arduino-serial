@@ -45,14 +45,15 @@ One example of hardware components
 ```
   host $ docker-compose build
   host $ docker-compose run arduino
-docker $ ./build.sh all                # build and upload (with -b arduino:avr:mega:cpu=atmega2560 -p /dev/ttyARDUINO_MEGA)
-                                       # you can set board by ARDUINO_BOARD, and port by ARDUINO_PORT environment variables
+docker $ ./build.sh -m GT all                # build and upload (with -b arduino:avr:mega:cpu=atmega2560 -p /dev/ttyARDUINO_MEGA)
+                                             # you can set board by ARDUINO_BOARD, and port by ARDUINO_PORT environment variables
+					     # need to specify GT/GTM for PIN configuration
 
 or use arduino-cli
-docker $ arduino-cli compile -b arduino:avr:mega:cpu=atmega2560 .
+docker $ arduino-cli compile -b arduino:avr:mega:cpu=atmega2560 -m GT .
 docker $ arduino-cli upload -b arduino:avr:mega:cpu=atmega2560 -p /dev/ttyARDUINO_MEGA .
 ```
-- change `-b <board type> -p <port>` for your environment
+- change `-b <board type> -p <port> -m <mode>` for your environment
 - linux is required to upload built sketch (Windows/Mac docker container does not support)
 
 
@@ -79,7 +80,6 @@ rosrun rosserial_arduino make_libraries.py ~/Arduino
 #### tips
 
 - rosserial 0.7.9 works with Arduino Mega 2560
-- rosserial 0.9.1 works with EPS32
 
 ## Assembly instructions
 
