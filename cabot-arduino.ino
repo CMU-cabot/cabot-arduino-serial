@@ -20,13 +20,7 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-#ifdef ESP32
-#undef ESP32
 #include <ros.h>
-#define ESP32
-#else
-#include <ros.h>
-#endif
 
 #include "Arduino.h"
 #include <arduino-timer.h>
@@ -46,27 +40,30 @@ Timer<10> timer;
 
 #define HEARTBEAT_DELAY (20)
 
-#ifdef ESP32
-// TODO: need to reconfigure
-#define BTN1_PIN (13) // up
-#define BTN2_PIN (14) // down
-#define BTN3_PIN (15) // left
-#define BTN4_PIN (16) // right
-
-#define VIB1_PIN (19)  //front
-#define VIB2_PIN (20)   //back //not using
-#define VIB3_PIN (18)  //left
-#define VIB4_PIN (17)   //right
-#else
+#ifdef GT
 #define BTN1_PIN (2) // up
 #define BTN2_PIN (3) // down
 #define BTN3_PIN (4) // left
 #define BTN4_PIN (5) // right
+#define BTN5_PIN (6) // decision //not using
 
 #define VIB1_PIN (11)  //front
 #define VIB2_PIN (6)   //back //not using
 #define VIB3_PIN (10)  //left
 #define VIB4_PIN (9)   //right
+#endif
+
+#ifdef GTM
+#define BTN1_PIN (2) // up
+#define BTN2_PIN (4) // down
+#define BTN3_PIN (3) // left
+#define BTN4_PIN (5) // right
+#define BTN5_PIN (6) // decision
+
+#define VIB1_PIN (10)  //front
+#define VIB2_PIN (12)   //back //not using
+#define VIB3_PIN (9)  //left
+#define VIB4_PIN (11)   //right
 #endif
 
 
@@ -75,9 +72,11 @@ Timer<10> timer;
 #define TOUCH_THRESHOLD_DEFAULT (64)
 #define RELEASE_THRESHOLD_DEFAULT (24)
 
+#define TIMEOUT_DEFAULT (2000)
+
 // sensors
 BarometerReader bmpReader(nh);
-ButtonsReader buttonsReader(nh, BTN1_PIN, BTN2_PIN, BTN3_PIN, BTN4_PIN);
+ButtonsReader buttonsReader(nh, BTN1_PIN, BTN2_PIN, BTN3_PIN, BTN4_PIN, BTN5_PIN);
 IMUReader imuReader(nh);
 TouchReader touchReader(nh);
 
@@ -97,7 +96,7 @@ void setup()
   nh.loginfo("Connected");
 
   int run_imu_calibration = 0;
-  nh.getParam("~run_imu_calibration", &run_imu_calibration, 1, 500);
+  nh.getParam("~run_imu_calibration", &run_imu_calibration, 1, TIMEOUT_DEFAULT);
   if (run_imu_calibration != 0) {
     imuReader.calibration();
     timer.every(100, [](){
@@ -110,7 +109,7 @@ void setup()
 
   int calibration_params[22];
   uint8_t *offsets = NULL;
-  if (nh.getParam("~calibration_params", calibration_params, 22, 500)) {
+  if (nh.getParam("~calibration_params", calibration_params, 22, TIMEOUT_DEFAULT)) {
     offsets = malloc(sizeof(uint8_t) * 22);
     for(int i = 0; i < 22; i++) {
       offsets[i] = calibration_params[i] & 0xFF;
@@ -130,15 +129,15 @@ void setup()
   int touch_baseline;
   int touch_threshold;
   int release_threshold;
-  if (!nh.getParam("~touch_params", touch_params, 3, 500)) {
+  if (!nh.getParam("~touch_params", touch_params, 3, TIMEOUT_DEFAULT)) {
     nh.logwarn("Please use touch_params:=[baseline,touch,release] format to set touch params");
     touch_baseline = TOUCH_BASELINE;
-    if (nh.getParam("~touch_threshold", &touch_threshold, 1, 500)) {
+    if (nh.getParam("~touch_threshold", &touch_threshold, 1, TIMEOUT_DEFAULT)) {
       nh.logwarn("touch_threshold is depricated");
     } else {
       touch_threshold = TOUCH_THRESHOLD_DEFAULT;
     }
-    if (nh.getParam("~release_threshold", &release_threshold, 1, 500)) {
+    if (nh.getParam("~release_threshold", &release_threshold, 1, TIMEOUT_DEFAULT)) {
       nh.logwarn("release_threshold is depricated");
     } else {
       release_threshold = RELEASE_THRESHOLD_DEFAULT;
