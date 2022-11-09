@@ -139,9 +139,9 @@ void Handle::publish(uint8_t cmd, int16_t data) {
 }
 
 void Handle::publish(uint8_t cmd, float data) {
-  uint8_t buff[2];
-  toBytes(data, buff, 2);
-  sendCommand(cmd, buff, 2);
+  uint8_t buff[4];
+  toBytes(data, buff);
+  sendCommand(cmd, buff, 4);
 }
 
 void Handle::sync() {

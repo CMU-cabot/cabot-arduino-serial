@@ -124,6 +124,7 @@ class ROSDelegate(CaBotArduinoSerialDelegate):
             msg.header.frame_id = "bmp_frame";
             self.pressure_pub.publish(msg)
         if cmd == 0x16:  # temperature
+            msg = Temperature()
             msg.temperature = struct.unpack('f', data)[0]
             msg.variance = 0;
             msg.header.stamp = rospy.Time.now();
