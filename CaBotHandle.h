@@ -31,6 +31,11 @@ typedef struct Time {
   unsigned long nsec;
 } Time;
 
+typedef struct Callback {
+  uint8_t cmd;
+  void (*callback)(const uint8_t);
+} Callback;
+
 class Handle {
  public:
   Handle();
@@ -39,7 +44,7 @@ class Handle {
   void init();
   bool connected();
   void spinOnce();
-  void subscribe(char *, void *(const uint8_t));
+  void subscribe(uint8_t, void (*)(const uint8_t));
   void logdebug(char *);
   void loginfo(char *);
   void logwarn(char *);
@@ -75,6 +80,8 @@ class Handle {
   uint8_t size_count = 0;
   uint8_t cmd = 0;
   uint8_t count = 0;
+  Callback callbacks[4];
+  size_t callback_count = 0;
   
 };
 }

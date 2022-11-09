@@ -296,7 +296,7 @@ class CaBotArduinoSerial:
         for i in range(0, count):
             data[5+i] = arg[i]
         data[count+5] = self.checksum(arg)
-        #self.delegate.log(logging.INFO, "send %s", data)
+        self.delegate.log(logging.DEBUG, "send %s"%(data))
         self.write_queue.put(bytes(data))
 
     def checksum(self, data):

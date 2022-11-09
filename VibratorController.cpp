@@ -34,10 +34,10 @@ VibratorController::VibratorController(cabot::Handle &ch,
   vib4_pin_(vib4_pin)
 {
   instance = this;
-  ch.subscribe("vibrator1", [](const uint8_t msg) {analogWrite(instance->vib1_pin_, msg);});
-  ch.subscribe("vibrator2", [](const uint8_t msg) {analogWrite(instance->vib2_pin_, msg);});
-  ch.subscribe("vibrator3", [](const uint8_t msg) {analogWrite(instance->vib3_pin_, msg);});
-  ch.subscribe("vibrator4", [](const uint8_t msg) {analogWrite(instance->vib4_pin_, msg);});
+  ch.subscribe(0x20, [](const uint8_t msg) {analogWrite(instance->vib1_pin_, msg);});
+  ch.subscribe(0x21, [](const uint8_t msg) {analogWrite(instance->vib2_pin_, msg);});
+  ch.subscribe(0x22, [](const uint8_t msg) {analogWrite(instance->vib3_pin_, msg);});
+  ch.subscribe(0x23, [](const uint8_t msg) {analogWrite(instance->vib4_pin_, msg);});
 }
 
 void VibratorController::init(){

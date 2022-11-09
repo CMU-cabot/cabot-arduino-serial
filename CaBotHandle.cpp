@@ -78,9 +78,24 @@ void Handle::spinOnce() {
     mTime.sec = parseUInt32(data);
     mTime.nsec = parseUInt32(data+4);
   }
+  if (0x20 <= cmd && cmd <= 0x23) {
+    uint8_t buff[32];
+    snprintf(buff, sizeof(buff), "cmd=%x, val=%d", cmd, data[0]);
+    loginfo(buff);
+    for(int i = 0; i < 4; i++) {
+      if (callbacks[i].cmd == cmd) {
+        callbacks[i].callback(data[0]);
+      }
+    }
+  }
+  cmd = 0; // reset
 }
 
-void Handle::subscribe(char * name, void *callback(const uint8_t)) {
+void Handle::subscribe(uint8_t cmd, void (*callback)(const uint8_t)) {
+  Callback temp;
+  temp.cmd = cmd;
+  temp.callback = callback;
+  callbacks[callback_count++] = temp;
 }
 
 void Handle::logdebug(char * text) {
@@ -179,7 +194,7 @@ size_t Handle::readCommand(uint8_t* expect, uint8_t** ptr) {
   int received = Serial.read();
   if (received < 0) return 0;
   //static uint8_t buff[48];
-  //sprintf(buff, "%d %d %d %d %d %d", state, header_count, size, size_count, cmd, count);
+  //sprintf(buff, "%d %d %x %x %d %d %d", state, header_count, cmd, *expect, size, size_count, count);
   //loginfo(buff);
   if (state == 0) {
     if (received == 0xAA) {

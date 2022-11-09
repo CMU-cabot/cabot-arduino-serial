@@ -7,19 +7,21 @@ import struct
 import time
 
 import rospy
-from std_msgs.msg import Int8, Int16, UInt8MultiArray
+from std_msgs.msg import Int8, UInt8, Int16, UInt8MultiArray
 from sensor_msgs.msg import Imu, FluidPressure, Temperature
 
 from cabot.arduino_serial import CaBotArduinoSerialDelegate, CaBotArduinoSerial
 
 class ROSDelegate(CaBotArduinoSerialDelegate):
-    def __init__(self):
+    def __init__(self, owner):
+        self.owner = owner
         self.dummy_param = {
             "~run_imu_calibration": [0],
             "~calibration_params": [231, 255, 234, 255, 8, 0, 52, 1, 247, 255, 140, 0, 0, 0, 255, 255, 1, 0, 232, 3, 107, 4, 3, 3, 3, 3],
             "~touch_params": [72, 24, 12]
         }
         self.throttle = {}
+        
         self.touch_raw_pub = rospy.Publisher("/touch_raw", Int16, queue_size=10)
         self.touch_pub = rospy.Publisher("/touch", Int16, queue_size=10)
         self.button_pub = rospy.Publisher("/button", Int8, queue_size=10)
@@ -28,6 +30,29 @@ class ROSDelegate(CaBotArduinoSerialDelegate):
         self.calibration_pub = rospy.Publisher("/calibration", UInt8MultiArray, queue_size=10)
         self.pressure_pub = rospy.Publisher("/pressure", FluidPressure, queue_size=10)
         self.temperature_pub = rospy.Publisher("/temperature", Temperature, queue_size=10)
+
+        self.vib1_sub = rospy.Subscriber("/vibrator1", UInt8, self.vib1_callback)
+        self.vib2_sub = rospy.Subscriber("/vibrator2", UInt8, self.vib2_callback)
+        self.vib3_sub = rospy.Subscriber("/vibrator3", UInt8, self.vib3_callback)
+        self.vib4_sub = rospy.Subscriber("/vibrator4", UInt8, self.vib4_callback)
+
+    def vib1_callback(self, msg):
+        data = bytearray()
+        data.append(msg.data)
+        self.owner.send_command(0x20, data)
+    def vib2_callback(self, msg):
+        data = bytearray()
+        data.append(msg.data)
+        self.owner.send_command(0x21, data)
+    def vib3_callback(self, msg):
+        data = bytearray()
+        data.append(msg.data)
+        self.owner.send_command(0x22, data)
+    def vib4_callback(self, msg):
+        data = bytearray()
+        data.append(msg.data)
+        self.owner.send_command(0x23, data)
+        
     def system_time(self):
         return time.time()
 
@@ -94,9 +119,9 @@ class ROSDelegate(CaBotArduinoSerialDelegate):
                                      ,struct.unpack('i', struct.pack('f', data2[1]))[0])
             if self.imu_last_topic_time is not None:
                 if self.imu_last_topic_time > imu_msg.header.stamp:
-                    rospy.logerr("IMU timestamp is not consistent, drop a message\n"+
-                                 "last imu time:%.2f > current imu time:%.2f",
-                                   self.imu_last_topic_time.to_sec(), imu_msg.header.stamp.to_sec())
+                    #rospy.logerr("IMU timestamp is not consistent, drop a message\n"+
+                    #             "last imu time:%.2f > current imu time:%.2f",
+                    #               self.imu_last_topic_time.to_sec(), imu_msg.header.stamp.to_sec())
                     return
 
             imu_msg.header.frame_id = "imu_frame"
@@ -137,7 +162,8 @@ def main():
     port_name = os.environ['CABOT_ARDUINO_PORT'] if 'CABOT_ARDUINO_PORT' in os.environ else '/dev/ttyARDUINO_MEGA'
     baud = int(os.environ['CABOT_ARDUINO_BAUD']) if 'CABOT_ARDUINO_BAUD' in os.environ else 115200
     
-    serial = CaBotArduinoSerial(port_name, baud, ROSDelegate())
+    serial = CaBotArduinoSerial(port_name, baud)
+    serial.delegate = ROSDelegate(serial)
     serial.start()
 
 if __name__ == "__main__":
