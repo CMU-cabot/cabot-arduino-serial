@@ -61,12 +61,9 @@ void TouchReader::update() {
     return;
   }
   int touched = cap_.touched();
-  //touch_msg_.data = touched;
-  //touch_pub_.publish( &touch_msg_ );
-  
-  //raw_msg_.data = cap_.filteredData(0);
-  //raw_pub_.publish( &raw_msg_ );
 
+  // touch
   ch_.publish(0x10, (int16_t) touched);
+  // touch_raw
   ch_.publish(0x11, (int16_t) cap_.filteredData(0));
 }

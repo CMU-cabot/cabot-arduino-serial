@@ -31,21 +31,16 @@ typedef struct Time {
   unsigned long nsec;
 } Time;
 
-typedef union
-{
-  uint8_t byte[4];
-  uint32_t value;
-} convert8_to_32;
-
 class Handle {
  public:
   Handle();
   ~Handle();
-  void setBaudRate(long);
+  void setBaudRate(unsigned long);
   void init();
   bool connected();
   void spinOnce();
   void subscribe(char *, void *(const uint8_t));
+  void logdebug(char *);
   void loginfo(char *);
   void logwarn(char *);
   bool getParam(char *, int *, size_t, int);
@@ -65,7 +60,7 @@ class Handle {
   void Handle::toBytes(uint32_t v, uint8_t* ptr, size_t num);
   void Handle::toBytes(float, uint8_t* ptr);
     
-  long mBaudRate;
+  unsigned long mBaudRate;
   Time mTime;
   unsigned long mSyncTime;
   float diff;

@@ -24,17 +24,17 @@
 
 namespace cabot{
 Handle::Handle() {
+  mBaudRate = 0;
 }
 
 Handle::~Handle() {
 }
 
-void Handle::setBaudRate(long rate) {
+void Handle::setBaudRate(unsigned long rate) {
   mBaudRate = rate;
 }
 
 void Handle::init() {
-  mBaudRate = 0;
   mConnected = false;
   mConnecting = false;
   mTimeOffset = 0;
@@ -62,27 +62,29 @@ void Handle::spinOnce() {
   static uint8_t cmd = 0;
   uint8_t *data;
   int count = readCommand(&cmd, &data);
-  if (count > 0) {
-    if (cmd == 0x01) { // time sync
-      if (millis() - mSyncTime < 1000) {
-        unsigned long temp = (millis() - mSyncTime) / 2UL;
-        diff = diff*0.9f + temp*0.1f;
-        
-        static uint8_t buff[24];
-        sprintf(buff, "diff=");
-        dtostrf(diff, 4, 2, buff+5);
-        loginfo(buff);
-
-        mTimeOffset = mSyncTime + diff;
+  if (count == 0) return;
+  
+  if (cmd == 0x01) { // time sync
+    uint32_t temp = (millis() - mSyncTime) / 2UL;
+    diff = diff*0.9f + temp*0.1f;
     
-        mTime.sec = parseUInt32(data);
-        mTime.nsec = parseUInt32(data+4);
-      }
-    }
+    uint8_t buff[32];
+    snprintf(buff, sizeof(buff), "diff=");
+    dtostrf(diff, 4, 2, buff+strlen(buff));
+    logdebug(buff);
+    
+    mTimeOffset = mSyncTime + diff;
+    
+    mTime.sec = parseUInt32(data);
+    mTime.nsec = parseUInt32(data+4);
   }
 }
 
 void Handle::subscribe(char * name, void *callback(const uint8_t)) {
+}
+
+void Handle::logdebug(char * text) {
+  sendCommand(0x02, text, strlen(text));
 }
 
 void Handle::loginfo(char * text) {
@@ -112,14 +114,14 @@ bool Handle::getParam(char * name, int * out, size_t num, int timeout_ms) {
   return true;
 }
 
-void Handle::publish(uint8_t cmd, int8_t* buff, size_t num) {
-  sendCommand(cmd, buff, num);
+void Handle::publish(uint8_t cmd, int8_t* data, size_t num) {
+  sendCommand(cmd, data, num);
 }
 
-void Handle::publish(uint8_t cmd, float* buff, size_t num) {
+void Handle::publish(uint8_t cmd, float* data, size_t num) {
   uint8_t temp[128];
   for(int i = 0; i < num; i++) {
-    toBytes(buff[i], temp+i*4);
+    toBytes(data[i], temp+i*4);
   }
   sendCommand(cmd, temp, num*4);
 }
@@ -154,7 +156,7 @@ void Handle::sync() {
 
 Time Handle::now() {
   Time current;
-  unsigned long diff = (millis() - mTimeOffset);
+  uint32_t diff = (millis() - mTimeOffset);
   
   current.sec = mTime.sec + (diff / 1000UL);
   current.nsec = mTime.nsec + (diff % 1000UL) * 1000000UL;
@@ -169,66 +171,57 @@ Time Handle::now() {
 size_t Handle::readCommand(uint8_t* expect, uint8_t** ptr) {  
   static uint8_t buffer[256];
 
-  if (Serial.available() > 0) {
-    int received = Serial.read();
-    static uint8_t buff[48];
-    sprintf(buff, "%d %d %d %d %d %d", state, header_count, size, size_count, cmd, count);
-    loginfo(buff);
-    if (state == 0) {
-      if (received == 0xAA) {
-        header_count += 1;
-      }
-      else {
-        header_count = 0;
-      }
-      if (header_count == 2) {
-        header_count = 0;
-        state = 1;
-      }
-      cmd = 0;
+  int received = Serial.read();
+  if (received < 0) return 0;
+  //static uint8_t buff[48];
+  //sprintf(buff, "%d %d %d %d %d %d", state, header_count, size, size_count, cmd, count);
+  //loginfo(buff);
+  if (state == 0) {
+    if (received == 0xAA) {
+      header_count += 1;
+    } else {
+      header_count = 0;
     }
-    else if (state == 1) {
-      cmd = received;
-      if (*expect == 0) {
-        *expect = cmd;
-      }
-      else if (cmd != *expect) {
-        state = 0;
-        return;
-      } 
-      state = 2;
-      size = 0;
-      size_count = 0;
+    if (header_count == 2) {
+      header_count = 0;
+      state = 1;
     }
-    else if (state == 2) {
-      size += (received & 0xFF) << size_count*8;
-      size_count += 1;
-      if (size_count == 2) {
-        if (size < 0 || 256 < size) {
-          state = 0;
-        }
-        else if (size == 0) {
-          state = 4;
-        }
-        else {
-          state = 3;
-        }
-      }
-      count = 0;
-    }
-    else if (state == 3) {
-      buffer[count] = received;
-      count += 1;
-      if (count == size) {
-        state = 4;
-      }
-    }
-    else if (state == 4) {
+    cmd = 0;
+  } else if (state == 1) {
+    cmd = received;
+    if (*expect == 0) {
+      *expect = cmd;
+    } else if (cmd != *expect) {
       state = 0;
-      if (received == checksum(buffer, size)) {
-        *ptr = buffer;
-        return size;
+      return;
+    } 
+    state = 2;
+    size = 0;
+    size_count = 0;
+  } else if (state == 2) {
+    size += (received & 0xFF) << size_count*8;
+    size_count += 1;
+    if (size_count == 2) {
+      if (size < 0 || 256 < size) {
+        state = 0;
+      } else if (size == 0) {
+        state = 4;
+      } else {
+        state = 3;
       }
+    }
+    count = 0;
+  } else if (state == 3) {
+    buffer[count] = received;
+    count += 1;
+    if (count == size) {
+      state = 4;
+    }
+  } else if (state == 4) {
+    state = 0;
+    if (received == checksum(buffer, size)) {
+      *ptr = buffer;
+      return size;
     }
   }
   return 0;
@@ -268,14 +261,17 @@ uint8_t Handle::checksum(uint8_t * data, size_t num) {
   return 0xFF - (0xFF & temp);
 }
 
-struct LongChar {
-  char c0; char c1; char c2; char c3;
-};
-
+typedef struct {
+  uint8_t c1;
+  uint8_t c2;
+  uint8_t c3;
+  uint8_t c4;
+} convert_t;
+  
 // bit shift over 16bit does not work
 uint32_t Handle::parseUInt32(uint8_t * ptr) {
-  LongChar l_Return = {ptr[0], ptr[1], ptr[2], ptr[3]};
-  return *reinterpret_cast<uint32_t*>(&l_Return);
+  convert_t temp = {ptr[0], ptr[1], ptr[2], ptr[3]};
+  return *reinterpret_cast<uint32_t *>(&temp);
 }
 
 void Handle::toBytes(uint32_t v, uint8_t* ptr, size_t num) {
@@ -284,18 +280,12 @@ void Handle::toBytes(uint32_t v, uint8_t* ptr, size_t num) {
   }
 }
 
-typedef union
-{
-  float number;
-  uint8_t bytes[4];
-} FLOATUNION_t;
 void Handle::toBytes(float v, uint8_t* ptr) {
-  FLOATUNION_t temp;
-  temp.number = v;
-  ptr[0] = temp.bytes[0];
-  ptr[1] = temp.bytes[1];
-  ptr[2] = temp.bytes[2];
-  ptr[3] = temp.bytes[3];
+  convert_t *temp = reinterpret_cast<convert_t*>(&v);
+  ptr[0] = temp->c1;
+  ptr[1] = temp->c2;
+  ptr[2] = temp->c3;
+  ptr[3] = temp->c4;
 }
 
 }

@@ -62,11 +62,11 @@ void IMUReader::update() {
   if (!initialized_) {
     return;
   }
-  static float data [12]; 
+  static float data[12]; 
   // put int32 as float32
   auto timestamp = ch_.now();
-  data[0] = *((float*)(&timestamp.sec));
-  data[1] = *((float*)(&timestamp.nsec));
+  data[0] = *reinterpret_cast<float*>(&timestamp.sec);
+  data[1] = *reinterpret_cast<float*>(&timestamp.nsec);
   
   imu::Quaternion q = imu_.getQuat();
 
@@ -89,7 +89,7 @@ void IMUReader::update() {
 
   // publish
   //imu_pub_.publish( &imu_msg_ );
-  ch_.publish(0x12, data, 12);
+  ch_.publish(0x13, data, 12);
 }
 
 void IMUReader::update_calibration() {

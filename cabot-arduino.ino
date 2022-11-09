@@ -35,7 +35,7 @@ cabot::Handle ch;
 Timer<10> timer;
 
 // configurations
-#define BAUDRATE (115200)
+#define BAUDRATE (115200UL)
 
 #define HEARTBEAT_DELAY (20)
 
@@ -92,8 +92,8 @@ void setup()
   // connect to rosserial
   ch.init();
 
-  while(!ch.connected()) {ch.spinOnce();}
   ch.loginfo("Connected");
+  while(!ch.connected()) {ch.spinOnce();}
 
   int run_imu_calibration = 0;
   ch.getParam("~run_imu_calibration", &run_imu_calibration, 1, TIMEOUT_DEFAULT);
