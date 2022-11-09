@@ -26,6 +26,8 @@ class ROSDelegate(CaBotArduinoSerialDelegate):
         self.imu_last_topic_time = None
         self.imu_pub = rospy.Publisher("/imu", Imu, queue_size=10)
         self.calibration_pub = rospy.Publisher("/calibration", UInt8MultiArray, queue_size=10)
+        self.pressure_pub = rospy.Publisher("/pressure", FluidPressure, queue_size=10)
+        self.temperature_pub = rospy.Publisher("/temperature", Temperature, queue_size=10)
     def system_time(self):
         return time.time()
 
@@ -115,10 +117,18 @@ class ROSDelegate(CaBotArduinoSerialDelegate):
             msg.data = data
             self.calibration_pub.publish(msg)
         if cmd == 0x15:  # pressure
-            pass
+            msg = FluidPressure()
+            msg.fluid_pressure = struct.unpack('f', data)[0]
+            msg.variance = 0;
+            msg.header.stamp = rospy.Time.now();
+            msg.header.frame_id = "bmp_frame";
+            self.pressure_pub.publish(msg)
         if cmd == 0x16:  # temperature
-            pass
-        
+            msg.temperature = struct.unpack('f', data)[0]
+            msg.variance = 0;
+            msg.header.stamp = rospy.Time.now();
+            msg.header.frame_id = "bmp_frame";
+            self.temperature_pub.publish(msg)
 
 
 def main():
