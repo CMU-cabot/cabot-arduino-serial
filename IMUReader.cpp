@@ -89,6 +89,7 @@ void IMUReader::update() {
 
   // publish
   //imu_pub_.publish( &imu_msg_ );
+  if (!ch_.is_synchronized()) return;
   ch_.publish(0x13, data, 12);
 }
 

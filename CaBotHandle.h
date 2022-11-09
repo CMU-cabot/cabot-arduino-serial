@@ -50,6 +50,7 @@ class Handle {
   void publish(uint8_t, int16_t);
   void publish(uint8_t, float);
   void sync();
+  bool is_synchronized();
   Time now();
   
  private:

@@ -155,6 +155,10 @@ void Handle::sync() {
   sendCommand(0x01, buff, 8);
 }
 
+bool Handle::is_synchronized() {
+  return mTimeOffset > 0;
+}
+
 Time Handle::now() {
   Time current;
   uint32_t diff = (millis() - mTimeOffset);
