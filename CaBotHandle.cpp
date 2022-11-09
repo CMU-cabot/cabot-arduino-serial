@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020  Carnegie Mellon University
+ * Copyright (c) 2020, 2022  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,8 @@
  *******************************************************************************/
 
 #include "CaBotHandle.h"
+
+//#define DEBUG 1
 
 namespace cabot{
 Handle::Handle() {
@@ -68,20 +70,18 @@ void Handle::spinOnce() {
     uint32_t temp = (millis() - mSyncTime) / 2UL;
     diff = diff*0.9f + temp*0.1f;
     
+#ifdef DEBUG
     uint8_t buff[32];
     snprintf(buff, sizeof(buff), "diff=");
     dtostrf(diff, 4, 2, buff+strlen(buff));
     logdebug(buff);
+#endif
     
-    mTimeOffset = mSyncTime + diff;
-    
+    mTimeOffset = mSyncTime + diff;    
     mTime.sec = parseUInt32(data);
     mTime.nsec = parseUInt32(data+4);
   }
   if (0x20 <= cmd && cmd <= 0x23) {
-    uint8_t buff[32];
-    snprintf(buff, sizeof(buff), "cmd=%x, val=%d", cmd, data[0]);
-    loginfo(buff);
     for(int i = 0; i < 4; i++) {
       if (callbacks[i].cmd == cmd) {
         callbacks[i].callback(data[0]);
@@ -193,9 +193,11 @@ size_t Handle::readCommand(uint8_t* expect, uint8_t** ptr) {
 
   int received = Serial.read();
   if (received < 0) return 0;
-  //static uint8_t buff[48];
-  //sprintf(buff, "%d %d %x %x %d %d %d", state, header_count, cmd, *expect, size, size_count, count);
-  //loginfo(buff);
+#ifdef DEBUG
+  static uint8_t buff[48];
+  snprintf(buff, 48, "%d %d %x %x %d %d %d", state, header_count, cmd, *expect, size, size_count, count);
+  loginfo(buff);
+#endif
   if (state == 0) {
     if (received == 0xAA) {
       header_count += 1;

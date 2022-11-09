@@ -2,11 +2,8 @@
 import abc
 from typing import Callable, List
 import logging
-import sys
-import termios
 import threading
 import time
-import traceback
 import queue
 
 import serial
@@ -22,12 +19,6 @@ class CaBotArduinoSerialDelegate(abc.ABC):
     def system_time(self):
         """
         return system time in linux time
-        """
-
-    @abc.abstractmethod
-    def spin(self):
-        """
-        run system spin
         """
 
     @abc.abstractmethod
@@ -94,37 +85,8 @@ class CaBotArduinoSerial:
         self.time_synced = False
 
     def start(self):
-        sleep_time = 3
-        while self.is_alive:
-            try:
-                self._open_serial()
-                self._run()
-                self.delegate.spin()
-            except KeyboardInterrupt as error:
-                self.delegate.log(logging.INFO, "KeyboardInterrupt")
-                break
-            except serial.SerialException as error:
-                error_msg = str(error)
-                self.delegate.log(logging.ERROR, error_msg)
-                time.sleep(sleep_time)
-            except IOError as error:
-                error_msg = str(error)
-                self.delegate.log(logging.ERROR, error_msg)
-                time.sleep(sleep_time)
-            except termios.error as error:
-                error_msg = str(error)
-                self.delegate.log(logging.ERROR, "connection disconnected")
-                time.sleep(sleep_time)
-            except SystemExit as error:
-                error_msg = str(error)
-                self.delegate.log(logging.ERROR, error_msg)
-                break
-            except:
-                self.delegate.log(logging.ERROR, sys.exc_info()[0])
-                traceback.print_exc(file=sys.stdout)
-                sys.exit()
-            finally:
-                self.stop()
+        self._open_serial()
+        self._run()
 
     def _open_serial(self):
         self.delegate.log(logging.INFO, "opening serial %s"%(self.port_name))
@@ -142,6 +104,16 @@ class CaBotArduinoSerial:
                 self.delegate.log(logging.ERROR, "%s"%(error))
                 time.sleep(3)
         self.delegate.log(logging.INFO, "serial port opened at %d"%(self.baud));
+
+    def _run(self):
+        if self.write_thread is None:
+            self.write_thread = threading.Thread(target=self._process_write)
+            self.write_thread.daemon = True
+            self.write_thread.start()
+        if self.read_thread is None:
+            self.read_thread = threading.Thread(target=self._process_read)
+            self.read_thread.daemon = True
+            self.read_thread.start()
 
     def stop(self):
         self.is_alive = False
@@ -184,26 +156,10 @@ class CaBotArduinoSerial:
         except Exception as error:
             raise IOError("Serial Port read failure: %s" % str(error))
 
-    @setInterval(3, times=1)
-    def send_start(self):
-        data = bytearray(1)
-        data[0] = 0x00
-        self.write_queue.put(bytes(data))
-
-    def _run(self):
-        if self.write_thread is None:
-            self.write_thread = threading.Thread(target=self._process_write)
-            self.write_thread.daemon = True
-            self.write_thread.start()
-        if self.read_thread is None:
-            self.read_thread = threading.Thread(target=self._process_read)
-            self.read_thread.daemon = True
-            self.read_thread.start()
-
     def _process_read(self):
         """
         serial command format:
-        \xAA\xAA[cmd,1][size,2][data,size][checksum]
+        \xAA\xAA[cmd,1][size,2][data,size][checksum,1]
         """
         reset_time = time.time()
 

@@ -4,7 +4,10 @@ import argparse
 import logging
 import os
 import struct
+import sys
+import termios
 import time
+import traceback
 
 import rospy
 from std_msgs.msg import Int8, UInt8, Int16, UInt8MultiArray
@@ -55,9 +58,6 @@ class ROSDelegate(CaBotArduinoSerialDelegate):
         
     def system_time(self):
         return time.time()
-
-    def spin(self):
-        rospy.spin()
 
     def log(self, level, text):
         if level == logging.INFO:
@@ -119,9 +119,9 @@ class ROSDelegate(CaBotArduinoSerialDelegate):
                                      ,struct.unpack('i', struct.pack('f', data2[1]))[0])
             if self.imu_last_topic_time is not None:
                 if self.imu_last_topic_time > imu_msg.header.stamp:
-                    #rospy.logerr("IMU timestamp is not consistent, drop a message\n"+
-                    #             "last imu time:%.2f > current imu time:%.2f",
-                    #               self.imu_last_topic_time.to_sec(), imu_msg.header.stamp.to_sec())
+                    rospy.logerr("IMU timestamp is not consistent, drop a message\n"+
+                                 "last imu time:%.2f > current imu time:%.2f",
+                                   self.imu_last_topic_time.to_sec(), imu_msg.header.stamp.to_sec())
                     return
 
             imu_msg.header.frame_id = "imu_frame"
@@ -164,7 +164,38 @@ def main():
     
     serial = CaBotArduinoSerial(port_name, baud)
     serial.delegate = ROSDelegate(serial)
-    serial.start()
+
+    sleep_time = 3
+    while serial.is_alive:
+        try:
+            serial.start()
+            rospy.spin()
+        except KeyboardInterrupt as error:
+            serial.delegate.log(logging.INFO, "KeyboardInterrupt")
+            break
+        except serial.SerialException as error:
+            error_msg = str(error)
+            serial.delegate.log(logging.ERROR, error_msg)
+            time.sleep(sleep_time)
+        except IOError as error:
+            error_msg = str(error)
+            serial.delegate.log(logging.ERROR, error_msg)
+            time.sleep(sleep_time)
+        except termios.error as error:
+            error_msg = str(error)
+            serial.delegate.log(logging.ERROR, "connection disconnected")
+            time.sleep(sleep_time)
+        except SystemExit as error:
+            error_msg = str(error)
+            serial.delegate.log(logging.ERROR, error_msg)
+            break
+        except:
+            serial.delegate.log(logging.ERROR, sys.exc_info()[0])
+            traceback.print_exc(file=sys.stdout)
+            sys.exit()
+        finally:
+            serial.stop()
+
 
 if __name__ == "__main__":
     rospy.init_node("cabot_serial_node")

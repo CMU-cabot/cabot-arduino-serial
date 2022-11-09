@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020  Carnegie Mellon University
+ * Copyright (c) 2020, 2022  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -49,13 +49,6 @@ void IMUReader::init(uint8_t *offsets) {
     imu_.setSensorOffsets(offsets);
   }
   imu_.setExtCrystalUse(true);
-
-  // time 2 + orientation 4 + angular_velocy 3 + linear_acceleration 3
-  //imu_msg_.data = (float*)malloc(sizeof(float)*12);
-  //imu_msg_.data_length = 12;
-
-  //calibration_msg_.data = (uint8_t*)malloc(sizeof(uint8_t)*26);
-  //calibration_msg_.data_length = 26;
 }
 
 void IMUReader::update() {
@@ -88,7 +81,6 @@ void IMUReader::update() {
   data[11] = xyz.z();
 
   // publish
-  //imu_pub_.publish( &imu_msg_ );
   if (!ch_.is_synchronized()) return;
   ch_.publish(0x13, data, 12);
 }
@@ -100,10 +92,7 @@ void IMUReader::update_calibration() {
 
   static uint8_t offsets[26];
 
-  //uint8_t *offsets = calibration_msg_.data;
   imu_.getSensorOffsets(offsets);
   imu_.getCalibration(offsets+22, offsets+23, offsets+24, offsets+25);
   ch_.publish(0x14, offsets, 26);
-
-  //calibration_pub_.publish( &calibration_msg_);
 }

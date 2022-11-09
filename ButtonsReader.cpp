@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020  Carnegie Mellon University
+ * Copyright (c) 2020, 2022  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,8 +61,6 @@ void ButtonsReader::update() {
     }
   }
   
-  //b_msg_.data = reading_1 | reading_2<<1 | reading_3<<2 | reading_4<<3 | reading_5<<4;
-  //b_pub_.publish(&b_msg_);
   int8_t temp = reading_1 | reading_2<<1 | reading_3<<2 | reading_4<<3 | reading_5<<4;
   ch_.publish(0x12, temp);
 }

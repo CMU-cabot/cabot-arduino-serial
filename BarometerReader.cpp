@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020  Carnegie Mellon University
+ * Copyright (c) 2020, 2022  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -49,17 +49,4 @@ void BarometerReader::update(){
 
   ch_.publish(0x15, bmp_.readPressure());
   ch_.publish(0x16, bmp_.readTemperature());
-  /*
-  fp_msg_.fluid_pressure = bmp_.readPressure();
-  fp_msg_.variance = 0;
-  fp_msg_.header.stamp = nh_.now();
-  fp_msg_.header.frame_id = "bmp_frame";
-  fp_pub_.publish( &fp_msg_ );
-  
-  tmp_msg_.temperature = bmp_.readTemperature();
-  tmp_msg_.variance = 0;
-  tmp_msg_.header.stamp = nh_.now();
-  tmp_msg_.header.frame_id = "bmp_frame";
-  tmp_pub_.publish( &tmp_msg_ );
-  */
 }

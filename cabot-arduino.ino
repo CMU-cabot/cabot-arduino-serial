@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020  Carnegie Mellon University
+ * Copyright (c) 2020, 2022  Carnegie Mellon University
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -141,8 +141,8 @@ void setup()
     touch_threshold = touch_params[1];
     release_threshold = touch_params[2];
   }
-  char default_values[128];
-  sprintf(default_values, "Using [%d, %d, %d] for touch_params", touch_baseline, touch_threshold, release_threshold);
+  char default_values[48];
+  snprintf(default_values, 48, "Using [%d, %d, %d] for touch_params", touch_baseline, touch_threshold, release_threshold);
   ch.loginfo(default_values);
 
   // initialize
