@@ -102,7 +102,8 @@ bool Handle::getParam(char * name, int * out, size_t num, int timeout_ms) {
   int count = 0;
   while(readCommand(&cmd, &ptr) == 0) {
     count+=1;
-    if (count > timeout_ms*10) {
+    delay(1);
+    if (count > timeout_ms) {
       loginfo("timeout");
       return false;
     }

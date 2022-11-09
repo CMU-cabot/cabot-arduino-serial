@@ -131,19 +131,9 @@ void setup()
   int release_threshold;
   if (!ch.getParam("~touch_params", touch_params, 3, TIMEOUT_DEFAULT)) {
     ch.logwarn("Please use touch_params:=[baseline,touch,release] format to set touch params");
-    /*
     touch_baseline = TOUCH_BASELINE;
-    if (ch.getParam("~touch_threshold", &touch_threshold, 1, TIMEOUT_DEFAULT)) {
-      ch.logwarn("touch_threshold is depricated");
-    } else {
-      touch_threshold = TOUCH_THRESHOLD_DEFAULT;
-    }
-    if (ch.getParam("~release_threshold", &release_threshold, 1, TIMEOUT_DEFAULT)) {
-      ch.logwarn("release_threshold is depricated");
-    } else {
-      release_threshold = RELEASE_THRESHOLD_DEFAULT;
-    }
-    */
+    touch_threshold = TOUCH_THRESHOLD_DEFAULT;
+    release_threshold = RELEASE_THRESHOLD_DEFAULT;
     ch.logwarn(" touched  if the raw value is less   than touch_params[0] - touch_params[1]");
     ch.logwarn(" released if the raw value is higher than touch_params[0] - touch_params[2]");
   } else {
