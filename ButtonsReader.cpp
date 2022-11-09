@@ -22,16 +22,14 @@
 
 #include "ButtonsReader.h"
 
-ButtonsReader::ButtonsReader(ros::NodeHandle &nh, int b1_pin, int b2_pin, int b3_pin, int b4_pin, int b5_pin):
-  SensorReader(nh),
+ButtonsReader::ButtonsReader(cabot::Handle &ch, int b1_pin, int b2_pin, int b3_pin, int b4_pin, int b5_pin):
+  SensorReader(ch),
   b1_pin_(b1_pin),
   b2_pin_(b2_pin),
   b3_pin_(b3_pin),
   b4_pin_(b4_pin),
-  b5_pin_(b5_pin),
-  b_pub_("pushed", &b_msg_)
+  b5_pin_(b5_pin)
 {
-  nh.advertise(b_pub_);
 }
 
 void ButtonsReader::init(){
@@ -63,7 +61,8 @@ void ButtonsReader::update() {
     }
   }
   
-  b_msg_.data = reading_1 | reading_2<<1 | reading_3<<2 | reading_4<<3 | reading_5<<4;
-        
-  b_pub_.publish(&b_msg_);
+  //b_msg_.data = reading_1 | reading_2<<1 | reading_3<<2 | reading_4<<3 | reading_5<<4;
+  //b_pub_.publish(&b_msg_);
+  int8_t temp = reading_1 | reading_2<<1 | reading_3<<2 | reading_4<<3 | reading_5<<4;
+  ch_.publish(0x12, temp);
 }

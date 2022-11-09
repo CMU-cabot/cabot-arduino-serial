@@ -19,8 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *******************************************************************************/
-
-#include <ros.h>
+#include "CaBotHandle.h"
 
 #include "Arduino.h"
 #include <arduino-timer.h>
@@ -32,7 +31,7 @@
 #include "TouchReader.h"
 #include "VibratorController.h"
 
-ros::NodeHandle nh;
+cabot::Handle ch;
 Timer<10> timer;
 
 // configurations
@@ -75,76 +74,78 @@ Timer<10> timer;
 #define TIMEOUT_DEFAULT (2000)
 
 // sensors
-BarometerReader bmpReader(nh);
-ButtonsReader buttonsReader(nh, BTN1_PIN, BTN2_PIN, BTN3_PIN, BTN4_PIN, BTN5_PIN);
-IMUReader imuReader(nh);
-TouchReader touchReader(nh);
+BarometerReader bmpReader(ch);
+ButtonsReader buttonsReader(ch, BTN1_PIN, BTN2_PIN, BTN3_PIN, BTN4_PIN, BTN5_PIN);
+IMUReader imuReader(ch);
+TouchReader touchReader(ch);
 
 // controllers
-VibratorController vibratorController(nh, VIB1_PIN, VIB2_PIN, VIB3_PIN, VIB4_PIN);
+VibratorController vibratorController(ch, VIB1_PIN, VIB2_PIN, VIB3_PIN, VIB4_PIN);
 Heartbeat heartbeat(LED_BUILTIN, HEARTBEAT_DELAY);
 
 
 void setup()
 {
   // set baud rate
-  nh.getHardware()->setBaud(BAUDRATE);
+  ch.setBaudRate(BAUDRATE);
 
   // connect to rosserial
-  nh.initNode();
-  while(!nh.connected()) {nh.spinOnce();}
-  nh.loginfo("Connected");
+  ch.init();
+
+  while(!ch.connected()) {ch.spinOnce();}
+  ch.loginfo("Connected");
 
   int run_imu_calibration = 0;
-  nh.getParam("~run_imu_calibration", &run_imu_calibration, 1, TIMEOUT_DEFAULT);
+  ch.getParam("~run_imu_calibration", &run_imu_calibration, 1, TIMEOUT_DEFAULT);
   if (run_imu_calibration != 0) {
     imuReader.calibration();
     timer.every(100, [](){
       imuReader.update();
       imuReader.update_calibration();
     });
-    nh.loginfo("Calibration Mode started");
+    ch.loginfo("Calibration Mode started");
     return;
   }
 
   int calibration_params[22];
   uint8_t *offsets = NULL;
-  if (nh.getParam("~calibration_params", calibration_params, 22, TIMEOUT_DEFAULT)) {
+  if (ch.getParam("~calibration_params", calibration_params, 22, TIMEOUT_DEFAULT)) {
     offsets = malloc(sizeof(uint8_t) * 22);
     for(int i = 0; i < 22; i++) {
       offsets[i] = calibration_params[i] & 0xFF;
     }
   } else {
-    nh.logwarn("clibration_params is needed to use IMU (BNO055) correctly.");
-    nh.logwarn("You can run calibration by setting _run_imu_calibration:=1");
-    nh.logwarn("You can check calibration value with /calibration topic.");
-    nh.logwarn("First 22 byte is calibration data, following 4 byte is calibration status for");
-    nh.logwarn("System, Gyro, Accel, Magnet, 0 (not configured) <-> 3 (configured)");
-    nh.logwarn("Specify like calibration_params:=[0, 0, 0, 0 ...]");
-    nh.logwarn("Visit the following link to check how to calibrate sensoe");
-    nh.logwarn("https://learn.adafruit.com/adafruit-bno055-absolute-orientation-sensor/device-calibration");
+    ch.logwarn("clibration_params is needed to use IMU (BNO055) correctly.");
+    ch.logwarn("You can run calibration by setting _run_imu_calibration:=1");
+    ch.logwarn("You can check calibration value with /calibration topic.");
+    ch.logwarn("First 22 byte is calibration data, following 4 byte is calibration status for");
+    ch.logwarn("System, Gyro, Accel, Magnet, 0 (not configured) <-> 3 (configured)");
+    ch.logwarn("Specify like calibration_params:=[0, 0, 0, 0 ...]");
+    ch.logwarn("Visit the following link to check how to calibrate sensoe");
+    ch.logwarn("https://learn.adafruit.com/adafruit-bno055-absolute-orientation-sensor/device-calibration");
   }
 
   int touch_params[3];
   int touch_baseline;
   int touch_threshold;
   int release_threshold;
-  if (!nh.getParam("~touch_params", touch_params, 3, TIMEOUT_DEFAULT)) {
-    nh.logwarn("Please use touch_params:=[baseline,touch,release] format to set touch params");
+  if (!ch.getParam("~touch_params", touch_params, 3, TIMEOUT_DEFAULT)) {
+    ch.logwarn("Please use touch_params:=[baseline,touch,release] format to set touch params");
+    /*
     touch_baseline = TOUCH_BASELINE;
-    if (nh.getParam("~touch_threshold", &touch_threshold, 1, TIMEOUT_DEFAULT)) {
-      nh.logwarn("touch_threshold is depricated");
+    if (ch.getParam("~touch_threshold", &touch_threshold, 1, TIMEOUT_DEFAULT)) {
+      ch.logwarn("touch_threshold is depricated");
     } else {
       touch_threshold = TOUCH_THRESHOLD_DEFAULT;
     }
-    if (nh.getParam("~release_threshold", &release_threshold, 1, TIMEOUT_DEFAULT)) {
-      nh.logwarn("release_threshold is depricated");
+    if (ch.getParam("~release_threshold", &release_threshold, 1, TIMEOUT_DEFAULT)) {
+      ch.logwarn("release_threshold is depricated");
     } else {
       release_threshold = RELEASE_THRESHOLD_DEFAULT;
     }
-
-    nh.logwarn(" touched  if the raw value is less   than touch_params[0] - touch_params[1]");
-    nh.logwarn(" released if the raw value is higher than touch_params[0] - touch_params[2]");
+    */
+    ch.logwarn(" touched  if the raw value is less   than touch_params[0] - touch_params[1]");
+    ch.logwarn(" released if the raw value is higher than touch_params[0] - touch_params[2]");
   } else {
     touch_baseline = touch_params[0];
     touch_threshold = touch_params[1];
@@ -152,26 +153,30 @@ void setup()
   }
   char default_values[128];
   sprintf(default_values, "Using [%d, %d, %d] for touch_params", touch_baseline, touch_threshold, release_threshold);
-  nh.loginfo(default_values);
+  ch.loginfo(default_values);
 
   // initialize
-  nh.loginfo("setting up BMP280");
+  ch.loginfo("setting up BMP280");
   bmpReader.init();
-  nh.loginfo("setting up Buttons");
+  ch.loginfo("setting up Buttons");
   buttonsReader.init();
-  nh.loginfo("setting up BNO055");
+  ch.loginfo("setting up BNO055");
   imuReader.init(offsets);
-  nh.loginfo("setting up MPR121");
+  ch.loginfo("setting up MPR121");
   touchReader.init(touch_baseline, touch_threshold, release_threshold);
-  nh.loginfo("setting up vibrations");
+  ch.loginfo("setting up vibrations");
   vibratorController.init();
-  nh.loginfo("setting up heartbeat");
+  ch.loginfo("setting up heartbeat");
   heartbeat.init();
   
   // wait sensors ready
   delay(100);
 
   // set timers
+  timer.every(1000, [](){
+      ch.sync();
+    });
+
   timer.every(500, [](){
       bmpReader.update();
     });
@@ -186,11 +191,11 @@ void setup()
       imuReader.update();
     });
   
-  nh.loginfo("Arduino is ready");
+  ch.loginfo("Arduino is ready");
 }
 
 void loop()
 {
   timer.tick<void>();
-  nh.spinOnce();
+  ch.spinOnce();
 }

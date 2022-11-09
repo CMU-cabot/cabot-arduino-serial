@@ -20,24 +20,66 @@
  * THE SOFTWARE.
  *******************************************************************************/
 
-#ifndef ARDUINO_NODE_SENSORREADER_H
-#define ARDUINO_NODE_SENSORREADER_H
+#ifndef CABOT_HANDLE_H
+#define CABOT_HANDLE_H
 
-#include "CaBotHandle.h"
 #include <Arduino.h>
 
-class SensorReader {
-protected:
-  cabot::Handle &ch_;
-  bool initialized_;
-  
-public:
-SensorReader(cabot::Handle &ch):
-  ch_(ch),
-  initialized_(false)
-  {}
-  virtual void init()=0;
-  virtual void update()=0;
-};
+namespace cabot{
+typedef struct Time {
+  unsigned long sec;
+  unsigned long nsec;
+} Time;
 
-#endif //ARDUINO_NODE_SENSORREADER_H
+typedef union
+{
+  uint8_t byte[4];
+  uint32_t value;
+} convert8_to_32;
+
+class Handle {
+ public:
+  Handle();
+  ~Handle();
+  void setBaudRate(long);
+  void init();
+  bool connected();
+  void spinOnce();
+  void subscribe(char *, void *(const uint8_t));
+  void loginfo(char *);
+  void logwarn(char *);
+  bool getParam(char *, int *, size_t, int);
+  void publish(uint8_t, int8_t*, size_t);
+  void publish(uint8_t, float*, size_t);
+  void publish(uint8_t, int8_t);
+  void publish(uint8_t, int16_t);
+  void publish(uint8_t, float);
+  void sync();
+  Time now();
+  
+ private:
+  bool sendCommand(uint8_t, uint8_t*, size_t);
+  size_t readCommand(uint8_t*, uint8_t**);
+  uint8_t checksum(uint8_t *, size_t);
+  uint32_t Handle::parseUInt32(uint8_t * ptr);
+  void Handle::toBytes(uint32_t v, uint8_t* ptr, size_t num);
+  void Handle::toBytes(float, uint8_t* ptr);
+    
+  long mBaudRate;
+  Time mTime;
+  unsigned long mSyncTime;
+  float diff;
+  unsigned long mTimeOffset;
+  bool mConnected;
+  bool mConnecting;
+
+  uint8_t state = 0;
+  uint8_t header_count = 0;
+  size_t size = 0;
+  uint8_t size_count = 0;
+  uint8_t cmd = 0;
+  uint8_t count = 0;
+  
+};
+}
+#endif //CABOT_HANDLE_H

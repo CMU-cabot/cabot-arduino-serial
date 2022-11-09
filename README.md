@@ -1,5 +1,19 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+
+# CaBot Arduino Serial
+
+This is a fork version of cabot-arduino which communicates with CaBot's Arduino board with a raw serial connection instead of using rosserial library.
+
+- We will migrate CaBot from ROS to ROS2
+- ROS2 does not support rosserial
+- ROS2 offers microROS but Arduino MEGA is not supported (need more RAM)
+
+So, we decided to use raw serial connection between PC and Arduino board and wrap it for ROS and ROS2.
+
+---
+copy of the original description
+
 # Cabot-Arduino
 
 This repository contains an Arduino project for CaBot, managaing sensors and the handle.

@@ -22,18 +22,14 @@
 
 #include "TouchReader.h"
 
-TouchReader::TouchReader(ros::NodeHandle &nh):
-  SensorReader(nh),
-  touch_pub_("touch", &touch_msg_),
-  raw_pub_("touch_raw", &raw_msg_)
+TouchReader::TouchReader(cabot::Handle &ch):
+  SensorReader(ch)
 {
-  nh.advertise(touch_pub_);
-  nh.advertise(raw_pub_);
 }
 
 void TouchReader::init() {
   if (!cap_.begin(0x5A)) {
-    nh_.loginfo("Ooops, no MPR121 detected ... Check your wiring or I2C ADDR!");
+    ch_.loginfo("Ooops, no MPR121 detected ... Check your wiring or I2C ADDR!");
     return;
   }
   initialized_ = true;
@@ -42,7 +38,7 @@ void TouchReader::init() {
 
 void TouchReader::init(uint8_t touch_baseline, uint8_t touch_threshold, uint8_t release_threshold) {
   if (!cap_.begin(0x5A, &Wire, touch_threshold, release_threshold)){
-    nh_.loginfo("Ooops, no MPR121 detected ... Check your wiring or I2C ADDR!");
+    ch_.loginfo("Ooops, no MPR121 detected ... Check your wiring or I2C ADDR!");
     return;
   }
   initialized_ = true;
@@ -57,7 +53,7 @@ void TouchReader::set_mode(uint8_t touch_baseline) {
   // use only pin 0
   cap_.writeRegister(MPR121_ECR, 0b01000001);
   
-  nh_.loginfo("Touch ready");
+  ch_.loginfo("Touch ready");
 }
 
 void TouchReader::update() {
@@ -65,10 +61,12 @@ void TouchReader::update() {
     return;
   }
   int touched = cap_.touched();
-  touch_msg_.data = touched;
-  touch_pub_.publish( &touch_msg_ );
+  //touch_msg_.data = touched;
+  //touch_pub_.publish( &touch_msg_ );
   
-  raw_msg_.data = cap_.filteredData(0);
-  raw_pub_.publish( &raw_msg_ );
-  
+  //raw_msg_.data = cap_.filteredData(0);
+  //raw_pub_.publish( &raw_msg_ );
+
+  ch_.publish(0x10, (int16_t) touched);
+  ch_.publish(0x11, (int16_t) cap_.filteredData(0));
 }

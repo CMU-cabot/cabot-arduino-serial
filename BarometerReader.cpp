@@ -22,19 +22,15 @@
 
 #include "BarometerReader.h"
 
-BarometerReader::BarometerReader(ros::NodeHandle &nh):
-  SensorReader(nh),
-  fp_pub_("pressure", &fp_msg_),
-  tmp_pub_("temperature", &tmp_msg_)
+BarometerReader::BarometerReader(cabot::Handle &ch):
+  SensorReader(ch)
 {
-  nh_.advertise(fp_pub_);
-  nh_.advertise(tmp_pub_);
 }
 
 void BarometerReader::init(){
   if(!bmp_.begin())
   {
-    nh_.loginfo("Ooops, no BMP280 detected ... Check your wiring or I2C ADDR!");
+    ch_.loginfo("Ooops, no BMP280 detected ... Check your wiring or I2C ADDR!");
     return;
   }
   initialized_ = true;
@@ -50,6 +46,10 @@ void BarometerReader::update(){
   if (!initialized_) {
     return;
   }
+
+  ch_.publish(0x15, bmp_.readPressure());
+  ch_.publish(0x16, bmp_.readTemperature());
+  /*
   fp_msg_.fluid_pressure = bmp_.readPressure();
   fp_msg_.variance = 0;
   fp_msg_.header.stamp = nh_.now();
@@ -61,4 +61,5 @@ void BarometerReader::update(){
   tmp_msg_.header.stamp = nh_.now();
   tmp_msg_.header.frame_id = "bmp_frame";
   tmp_pub_.publish( &tmp_msg_ );
+  */
 }
