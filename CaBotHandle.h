@@ -59,6 +59,8 @@ class Handle {
   Time now();
   
  private:
+  Time _now(Time, uint32_t, uint32_t);
+  int32_t timeDiff(Time, Time);
   bool sendCommand(uint8_t, uint8_t*, size_t);
   size_t readCommand(uint8_t*, uint8_t**);
   uint8_t checksum(uint8_t *, size_t);
@@ -66,11 +68,12 @@ class Handle {
   void Handle::toBytes(uint32_t v, uint8_t* ptr, size_t num);
   void Handle::toBytes(float, uint8_t* ptr);
     
-  unsigned long mBaudRate;
+  uint32_t mBaudRate;
   Time mTime;
-  unsigned long mSyncTime;
-  float diff;
-  unsigned long mTimeOffset;
+  uint32_t mTimeOffset;
+  uint32_t mTimeMillis;
+  uint32_t mSyncTime;
+  float mDelayRate = 1.0;
   bool mConnected;
   bool mConnecting;
 
