@@ -25,7 +25,8 @@
 
 #include <Arduino.h>
 
-namespace cabot{
+namespace cabot
+{
 typedef struct Time {
   unsigned long sec;
   unsigned long nsec;
@@ -36,8 +37,9 @@ typedef struct Callback {
   void (*callback)(const uint8_t);
 } Callback;
 
-class Handle {
- public:
+class Handle
+{
+public:
   Handle();
   ~Handle();
   void setBaudRate(unsigned long);
@@ -49,25 +51,28 @@ class Handle {
   void loginfo(char *);
   void logwarn(char *);
   bool getParam(char *, int *, size_t, int);
-  void publish(uint8_t, int8_t*, size_t);
-  void publish(uint8_t, float*, size_t);
+  void publish(uint8_t, uint8_t *, size_t);
+  void publish(uint8_t, int8_t *, size_t);
+  void publish(uint8_t, char *, size_t);
+  void publish(uint8_t, float *, size_t);
   void publish(uint8_t, int8_t);
   void publish(uint8_t, int16_t);
   void publish(uint8_t, float);
   void sync();
   bool is_synchronized();
   Time now();
-  
- private:
+
+private:
   Time _now(Time, uint32_t, uint32_t);
   int32_t timeDiff(Time, Time);
-  bool sendCommand(uint8_t, uint8_t*, size_t);
-  size_t readCommand(uint8_t*, uint8_t**);
+  bool sendCommand(uint8_t, uint8_t *, size_t);
+  bool sendCommand(uint8_t, char *, size_t);
+  size_t readCommand(uint8_t *, uint8_t **);
   uint8_t checksum(uint8_t *, size_t);
-  uint32_t Handle::parseUInt32(uint8_t * ptr);
-  void Handle::toBytes(uint32_t v, uint8_t* ptr, size_t num);
-  void Handle::toBytes(float, uint8_t* ptr);
-    
+  uint32_t parseUInt32(uint8_t *ptr);
+  void toBytes(uint32_t v, uint8_t *ptr, size_t num);
+  void toBytes(float, uint8_t *ptr);
+
   uint32_t mBaudRate;
   Time mTime;
   uint32_t mTimeOffset;
@@ -85,7 +90,6 @@ class Handle {
   uint8_t count = 0;
   Callback callbacks[4];
   size_t callback_count = 0;
-  
 };
-}
-#endif //CABOT_HANDLE_H
+} // namespace cabot
+#endif // CABOT_HANDLE_H
