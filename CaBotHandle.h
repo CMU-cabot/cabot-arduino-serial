@@ -25,8 +25,7 @@
 
 #include <Arduino.h>
 
-namespace cabot
-{
+namespace cabot {
 typedef struct Time {
   unsigned long sec;
   unsigned long nsec;
@@ -37,9 +36,8 @@ typedef struct Callback {
   void (*callback)(const uint8_t);
 } Callback;
 
-class Handle
-{
-public:
+class Handle {
+ public:
   Handle();
   ~Handle();
   void setBaudRate(unsigned long);
@@ -62,7 +60,7 @@ public:
   bool is_synchronized();
   Time now();
 
-private:
+ private:
   Time _now(Time, uint32_t, uint32_t);
   int32_t timeDiff(Time, Time);
   bool sendCommand(uint8_t, uint8_t *, size_t);
@@ -91,5 +89,5 @@ private:
   Callback callbacks[4];
   size_t callback_count = 0;
 };
-} // namespace cabot
-#endif // CABOT_HANDLE_H
+}  // namespace cabot
+#endif  // CABOT_HANDLE_H
