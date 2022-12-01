@@ -22,7 +22,7 @@
 
 #include "CaBotHandle.h"
 
-// #define DEBUG 1
+//#define DEBUG 1
 
 namespace cabot {
 Handle::Handle() { mBaudRate = 0; }
@@ -66,7 +66,7 @@ void Handle::spinOnce() {
 
   if (cmd == 0x01 && count == 8) {
     // time sync command
-    static uint8_t buff[128];
+    static char buff[128];
     // get the half of the turn around time
     // outbound and inbound transmission time is expected to be equal
     // the PC will return its time when it recevied the sync command
@@ -138,11 +138,7 @@ void Handle::subscribe(uint8_t cmd, void (*callback)(const uint8_t)) {
   callbacks[callback_count++] = temp;
 }
 
-void Handle::logdebug(char *text) {
-  // code的にはこれで問題ないと思います。
-  // sendCommandの引数でchar*で受けるものを作って、そちらでcastするのが良いと思います。
-  sendCommand(0x02, text, strlen(text));
-}
+void Handle::logdebug(char *text) { sendCommand(0x02, text, strlen(text)); }
 
 void Handle::loginfo(char *text) { sendCommand(0x03, text, strlen(text)); }
 
@@ -287,7 +283,7 @@ size_t Handle::readCommand(uint8_t *expect, uint8_t **ptr) {
 #ifdef DEBUG
   // print out read command state
   if (state != 0 || received != 0) {
-    static uint8_t buff[48];
+    static char buff[48];
     snprintf(buff, 48, "%02x %d %d %x %x %d %d %d", received, state,
              header_count, cmd, *expect, size, size_count, count);
     loginfo(buff);
