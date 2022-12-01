@@ -25,34 +25,36 @@
 // keep the instance as static for callback
 VibratorController *instance;
 
-VibratorController::VibratorController(cabot::Handle &ch,
-				       int vib1_pin, int vib2_pin, int vib3_pin, int vib4_pin):
-  SensorReader(ch),
-  vib1_pin_(vib1_pin),
-  vib2_pin_(vib2_pin),
-  vib3_pin_(vib3_pin),
-  vib4_pin_(vib4_pin)
-{
+VibratorController::VibratorController(cabot::Handle &ch, int vib1_pin,
+                                       int vib2_pin, int vib3_pin, int vib4_pin)
+    : SensorReader(ch),
+      vib1_pin_(vib1_pin),
+      vib2_pin_(vib2_pin),
+      vib3_pin_(vib3_pin),
+      vib4_pin_(vib4_pin) {
   instance = this;
-  ch.subscribe(0x20, [](const uint8_t msg) {analogWrite(instance->vib1_pin_, msg);});
-  ch.subscribe(0x21, [](const uint8_t msg) {analogWrite(instance->vib2_pin_, msg);});
-  ch.subscribe(0x22, [](const uint8_t msg) {analogWrite(instance->vib3_pin_, msg);});
-  ch.subscribe(0x23, [](const uint8_t msg) {analogWrite(instance->vib4_pin_, msg);});
+  ch.subscribe(
+      0x20, [](const uint8_t msg) { analogWrite(instance->vib1_pin_, msg); });
+  ch.subscribe(
+      0x21, [](const uint8_t msg) { analogWrite(instance->vib2_pin_, msg); });
+  ch.subscribe(
+      0x22, [](const uint8_t msg) { analogWrite(instance->vib3_pin_, msg); });
+  ch.subscribe(
+      0x23, [](const uint8_t msg) { analogWrite(instance->vib4_pin_, msg); });
 }
 
-void VibratorController::init(){
+void VibratorController::init() {
   pinMode(vib1_pin_, OUTPUT);
-  analogWrite(vib1_pin_,0);
-  
+  analogWrite(vib1_pin_, 0);
+
   pinMode(vib2_pin_, OUTPUT);
-  analogWrite(vib2_pin_,0);
-  
+  analogWrite(vib2_pin_, 0);
+
   pinMode(vib3_pin_, OUTPUT);
-  analogWrite(vib3_pin_,0);
-  
+  analogWrite(vib3_pin_, 0);
+
   pinMode(vib4_pin_, OUTPUT);
-  analogWrite(vib4_pin_,0);
+  analogWrite(vib4_pin_, 0);
 }
 
-void VibratorController::update() {
-}
+void VibratorController::update() {}

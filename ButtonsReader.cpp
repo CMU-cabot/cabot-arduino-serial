@@ -22,17 +22,16 @@
 
 #include "ButtonsReader.h"
 
-ButtonsReader::ButtonsReader(cabot::Handle &ch, int b1_pin, int b2_pin, int b3_pin, int b4_pin, int b5_pin):
-  SensorReader(ch),
-  b1_pin_(b1_pin),
-  b2_pin_(b2_pin),
-  b3_pin_(b3_pin),
-  b4_pin_(b4_pin),
-  b5_pin_(b5_pin)
-{
-}
+ButtonsReader::ButtonsReader(cabot::Handle &ch, int b1_pin, int b2_pin,
+                             int b3_pin, int b4_pin, int b5_pin)
+    : SensorReader(ch),
+      b1_pin_(b1_pin),
+      b2_pin_(b2_pin),
+      b3_pin_(b3_pin),
+      b4_pin_(b4_pin),
+      b5_pin_(b5_pin) {}
 
-void ButtonsReader::init(){
+void ButtonsReader::init() {
   pinMode(b1_pin_, INPUT_PULLUP);
   pinMode(b2_pin_, INPUT_PULLUP);
   pinMode(b3_pin_, INPUT_PULLUP);
@@ -50,17 +49,18 @@ void ButtonsReader::update() {
     reading_5 = !digitalRead(b5_pin_);
   }
 
-  for(int i = 0; i < 10; i++) {
+  for (int i = 0; i < 10; i++) {
     delayMicroseconds(10);
     reading_1 = reading_1 && !digitalRead(b1_pin_);
     reading_2 = reading_2 && !digitalRead(b2_pin_);
-    reading_3 = reading_3 && !digitalRead(b3_pin_);  
-    reading_4 = reading_4 && !digitalRead(b4_pin_); 
+    reading_3 = reading_3 && !digitalRead(b3_pin_);
+    reading_4 = reading_4 && !digitalRead(b4_pin_);
     if (b5_pin_ > 0) {
       reading_5 = reading_5 && !digitalRead(b5_pin_);
     }
   }
-  
-  int8_t temp = reading_1 | reading_2<<1 | reading_3<<2 | reading_4<<3 | reading_5<<4;
+
+  int8_t temp = reading_1 | reading_2 << 1 | reading_3 << 2 | reading_4 << 3 |
+                reading_5 << 4;
   ch_.publish(0x12, temp);
 }

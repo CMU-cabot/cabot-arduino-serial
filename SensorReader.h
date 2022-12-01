@@ -23,21 +23,18 @@
 #ifndef ARDUINO_NODE_SENSORREADER_H
 #define ARDUINO_NODE_SENSORREADER_H
 
-#include "CaBotHandle.h"
 #include <Arduino.h>
+#include "CaBotHandle.h"
 
 class SensorReader {
-protected:
+ protected:
   cabot::Handle &ch_;
   bool initialized_;
-  
-public:
-SensorReader(cabot::Handle &ch):
-  ch_(ch),
-  initialized_(false)
-  {}
-  virtual void init()=0;
-  virtual void update()=0;
+
+ public:
+  SensorReader(cabot::Handle &ch) : ch_(ch), initialized_(false) {}
+  virtual void init() = 0;
+  virtual void update() = 0;
 };
 
-#endif //ARDUINO_NODE_SENSORREADER_H
+#endif  // ARDUINO_NODE_SENSORREADER_H

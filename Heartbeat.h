@@ -32,13 +32,10 @@ class Heartbeat {
   int led_pin_;
   int delay_;
   int status_;
-public:
-Heartbeat(int led_pin, int delay):
-  led_pin_(led_pin),
-  delay_(delay),
-  status_(0)
-  {
-  }
+
+ public:
+  Heartbeat(int led_pin, int delay)
+      : led_pin_(led_pin), delay_(delay), status_(0) {}
 
   void init() {
     pinMode(led_pin_, OUTPUT);
@@ -46,9 +43,9 @@ Heartbeat(int led_pin, int delay):
   }
 
   void update() {
-    status_ = status_+1;
+    status_ = status_ + 1;
     analogWrite(led_pin_, sin(6.28 * status_ * delay_ / 1000.0) * 127 + 127);
   }
 };
 
-#endif // ARDUINO_NODE_HEARTBEAT_H
+#endif  // ARDUINO_NODE_HEARTBEAT_H

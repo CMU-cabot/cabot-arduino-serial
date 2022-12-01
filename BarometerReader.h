@@ -23,18 +23,18 @@
 #ifndef ARDUINO_NODE_BAROMETER_H
 #define ARDUINO_NODE_BAROMETER_H
 
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
 #include <Adafruit_BMP280.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
 #include "SensorReader.h"
 
-class BarometerReader : public SensorReader{
+class BarometerReader : public SensorReader {
   Adafruit_BMP280 bmp_;
 
-public:
+ public:
   BarometerReader(cabot::Handle &ch);
   void init();
   void update();
 };
 
-#endif //ARDUINO_NODE_BAROMETER_H
+#endif  // ARDUINO_NODE_BAROMETER_H

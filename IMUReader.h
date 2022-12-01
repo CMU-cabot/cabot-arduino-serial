@@ -23,15 +23,16 @@
 #ifndef ARDUINO_NODE_IMUREADER_H
 #define ARDUINO_NODE_IMUREADER_H
 
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
 #include "SensorReader.h"
 
-class IMUReader: public SensorReader {
+class IMUReader : public SensorReader {
   Adafruit_BNO055 imu_;
   int in_calibration_;
-public:
+
+ public:
   IMUReader(cabot::Handle &ch);
   void calibration();
   void init();
@@ -40,5 +41,4 @@ public:
   void update_calibration();
 };
 
-
-#endif //ARDUINO_NODE_IMUREADER_H
+#endif  // ARDUINO_NODE_IMUREADER_H

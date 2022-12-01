@@ -29,15 +29,17 @@
 #include <analogWrite.h>
 #endif
 
-class VibratorController: public SensorReader {
+class VibratorController : public SensorReader {
   int vib1_pin_;
   int vib2_pin_;
   int vib3_pin_;
   int vib4_pin_;
-public:
-  VibratorController(cabot::Handle &ch, int vib1_pin, int vib2_pin, int vib3_pin, int vib4_pin);
+
+ public:
+  VibratorController(cabot::Handle &ch, int vib1_pin, int vib2_pin,
+                     int vib3_pin, int vib4_pin);
   void init();
   void update();
 };
 
-#endif //ARDUINO_NODE_VIBRATOR_CONTROLLER_H
+#endif  // ARDUINO_NODE_VIBRATOR_CONTROLLER_H

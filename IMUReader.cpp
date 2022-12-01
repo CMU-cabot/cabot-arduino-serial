@@ -24,23 +24,17 @@
 
 #define D2R 0.0174532925
 
-IMUReader::IMUReader(cabot::Handle &ch):
-  SensorReader(ch)
-{
-}
+IMUReader::IMUReader(cabot::Handle &ch) : SensorReader(ch) {}
 
 void IMUReader::calibration() {
   in_calibration_ = true;
   init();
 }
 
-void IMUReader::init() {
-  init(NULL);
-}
+void IMUReader::init() { init(NULL); }
 
 void IMUReader::init(uint8_t *offsets) {
-  if(!imu_.begin())
-  {
+  if (!imu_.begin()) {
     ch_.loginfo("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
     return;
   }
@@ -55,12 +49,12 @@ void IMUReader::update() {
   if (!initialized_) {
     return;
   }
-  static float data[12]; 
+  static float data[12];
   // put int32 as float32
   auto timestamp = ch_.now();
-  data[0] = *reinterpret_cast<float*>(&timestamp.sec);
-  data[1] = *reinterpret_cast<float*>(&timestamp.nsec);
-  
+  data[0] = *reinterpret_cast<float *>(&timestamp.sec);
+  data[1] = *reinterpret_cast<float *>(&timestamp.nsec);
+
   imu::Quaternion q = imu_.getQuat();
 
   data[2] = q.x();
@@ -70,10 +64,10 @@ void IMUReader::update() {
 
   imu::Vector<3> xyz = imu_.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
 
-  data[6] = xyz.x()*D2R;
-  data[7] = xyz.y()*D2R;
-  data[8] = xyz.z()*D2R;
-    
+  data[6] = xyz.x() * D2R;
+  data[7] = xyz.y() * D2R;
+  data[8] = xyz.z() * D2R;
+
   xyz = imu_.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
 
   data[9] = xyz.x();
@@ -93,6 +87,6 @@ void IMUReader::update_calibration() {
   static uint8_t offsets[26];
 
   imu_.getSensorOffsets(offsets);
-  imu_.getCalibration(offsets+22, offsets+23, offsets+24, offsets+25);
+  imu_.getCalibration(offsets + 22, offsets + 23, offsets + 24, offsets + 25);
   ch_.publish(0x14, offsets, 26);
 }

@@ -22,27 +22,23 @@
 
 #include "BarometerReader.h"
 
-BarometerReader::BarometerReader(cabot::Handle &ch):
-  SensorReader(ch)
-{
-}
+BarometerReader::BarometerReader(cabot::Handle &ch) : SensorReader(ch) {}
 
-void BarometerReader::init(){
-  if(!bmp_.begin())
-  {
+void BarometerReader::init() {
+  if (!bmp_.begin()) {
     ch_.loginfo("Ooops, no BMP280 detected ... Check your wiring or I2C ADDR!");
     return;
   }
   initialized_ = true;
-  
+
   bmp_.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
-		   Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
-		   Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
-		   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
-		   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
+                   Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
+                   Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
+                   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
+                   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
 }
 
-void BarometerReader::update(){
+void BarometerReader::update() {
   if (!initialized_) {
     return;
   }

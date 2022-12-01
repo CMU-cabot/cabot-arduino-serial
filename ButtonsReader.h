@@ -26,16 +26,18 @@
 #include <Wire.h>
 #include "SensorReader.h"
 
-class ButtonsReader: public SensorReader {
+class ButtonsReader : public SensorReader {
   int b1_pin_;
   int b2_pin_;
   int b3_pin_;
   int b4_pin_;
   int b5_pin_;
-public:
-  ButtonsReader(cabot::Handle &ch, int b1_pin, int b2_pin, int b3_pin, int b4_pin, int b5_pin);
+
+ public:
+  ButtonsReader(cabot::Handle &ch, int b1_pin, int b2_pin, int b3_pin,
+                int b4_pin, int b5_pin);
   void init();
   void update();
 };
 
-#endif //ARDUINO_NODE_BUTTONS_READER_H
+#endif  // ARDUINO_NODE_BUTTONS_READER_H

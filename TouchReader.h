@@ -23,21 +23,23 @@
 #ifndef ARDUINO_NODE_TOUCH_READER_H
 #define ARDUINO_NODE_TOUCH_READER_H
 
-#include <Wire.h>
 #include <Adafruit_MPR121.h>
+#include <Wire.h>
 #include "SensorReader.h"
 
-class TouchReader: public SensorReader {
+class TouchReader : public SensorReader {
   Adafruit_MPR121 cap_;
   int16_t touched_;
 
-public:
+ public:
   TouchReader(cabot::Handle &ch);
   void init();
-  void init(uint8_t touch_baseline, uint8_t touch_threshold, uint8_t release_threshold);
+  void init(uint8_t touch_baseline, uint8_t touch_threshold,
+            uint8_t release_threshold);
   void update();
-private:
+
+ private:
   void set_mode(uint8_t touch_baseline);
 };
 
-#endif //ARDUINO_NODE_TOUCH_READER_H
+#endif  // ARDUINO_NODE_TOUCH_READER_H
