@@ -96,7 +96,7 @@ void setup() {
   }
 
   int run_imu_calibration = 0;
-  ch.getParam("~run_imu_calibration", &run_imu_calibration, 1, TIMEOUT_DEFAULT);
+  ch.getParam("run_imu_calibration", &run_imu_calibration, 1, TIMEOUT_DEFAULT);
   if (run_imu_calibration != 0) {
     imuReader.calibration();
     timer.every(100, []() {
@@ -109,7 +109,7 @@ void setup() {
 
   int calibration_params[22];
   uint8_t *offsets = NULL;
-  if (ch.getParam("~calibration_params", calibration_params, 22,
+  if (ch.getParam("calibration_params", calibration_params, 22,
                   TIMEOUT_DEFAULT)) {
     offsets = malloc(sizeof(uint8_t) * 22);
     for (int i = 0; i < 22; i++) {
@@ -135,7 +135,7 @@ void setup() {
   int touch_baseline;
   int touch_threshold;
   int release_threshold;
-  if (!ch.getParam("~touch_params", touch_params, 3, TIMEOUT_DEFAULT)) {
+  if (!ch.getParam("touch_params", touch_params, 3, TIMEOUT_DEFAULT)) {
     ch.logwarn(
         "Please use touch_params:=[baseline,touch,release] format to set touch "
         "params");
