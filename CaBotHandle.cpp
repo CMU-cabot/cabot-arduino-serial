@@ -150,12 +150,14 @@ bool Handle::getParam(char *name, int *out, size_t num, int timeout_ms) {
   uint8_t *ptr;
   int count = 0;
   int read_count = 0;
+  uint32_t start = millis();
   while ((read_count = readCommand(&cmd, &ptr)) < 0) {
     count += 1;
-    delay(1);
-    if (count > timeout_ms) {
-      // loginfo("timeout");
-      return false;
+    if (count % 100 == 0) {
+      if (millis() - start > timeout_ms) {
+        // loginfo("timeout");
+        return false;
+      }
     }
   }
   if (read_count == 0) {
