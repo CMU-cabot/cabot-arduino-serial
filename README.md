@@ -1,5 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+move to https://github.com/CMU-cabot/cabot-arduino/tree/ros2
 
 # CaBot Arduino Serial
 
